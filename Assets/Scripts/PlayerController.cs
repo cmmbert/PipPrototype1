@@ -15,7 +15,6 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         _playerControllable.Move(_moveVector);
-
     }
 
     public void OnMove(InputValue value)
