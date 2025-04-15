@@ -4,7 +4,9 @@ public class PipController : MonoBehaviour, IPlayerControllable
 {
     Rigidbody _rb;
     [SerializeField] float _moveSpeed = 100;
+    [SerializeField] float _rotationSpeed = 360;
     [SerializeField] Transform _cameraTransform;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -38,10 +40,10 @@ public class PipController : MonoBehaviour, IPlayerControllable
             //y *= Mathf.Rad2Deg;
             var dir = new Vector2(Mathf.Cos(y), Mathf.Sin(y)) + camera;
             var uitkomst = (dir - camera).normalized;
-            Debug.DrawLine(new Vector3(pip.x, 0, pip.y), new Vector3(uitkomst.x, 0, uitkomst.y), Color.red, 2);
-            transform.LookAt(transform.position + new Vector3(uitkomst.x, 0, uitkomst.y));
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, Quaternion.Euler(new Vector3(0, Mathf.Atan2(uitkomst.x, uitkomst.y) * Mathf.Rad2Deg, 0)), _rotationSpeed * Time.deltaTime);
+            var force = new Vector3(uitkomst.x, 0, uitkomst.y) * _moveSpeed * Time.deltaTime;
+            _rb.AddForce(force);
         }
-        //_rb.AddForce(new Vector3(axis.x * _moveSpeed * Time.deltaTime, 0, axis.y * _moveSpeed * Time.deltaTime));
     }
 
     public void MoveCamera(Vector2 axis)
