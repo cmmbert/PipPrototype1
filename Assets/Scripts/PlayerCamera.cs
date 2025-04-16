@@ -2,17 +2,32 @@ using UnityEngine;
 
 public class PlayerCamera : MonoBehaviour
 {
+    [SerializeField] Transform _cameraRotationPoint;
     [SerializeField] Transform _toFollow;
-    void Update()
-    {
-        transform.LookAt(_toFollow);
-    }
+    [SerializeField] float _lateralRotationSpeed = 45;
+
+
+    Vector2 _requestedRotation;
+    
 
     public void OnCameraMove(Vector2 axis)
     {
-        if (Mathf.Abs(axis.x) > 0)
+        _requestedRotation = axis;
+        if (_requestedRotation.x > 1) _requestedRotation.x = 1;
+        if (_requestedRotation.x < -1) _requestedRotation.x = -1;
+    }
+
+    private void FixedUpdate()
+    {
+        CameraRotation();
+    }
+
+    void CameraRotation()
+    {
+        if (Mathf.Abs(_requestedRotation.x) > 0)
         {
-            transform.RotateAround(_toFollow.position, Vector3.up, Mathf.Sign(axis.x) * (axis.x / axis.x));
+            _cameraRotationPoint.Rotate(new Vector3(0, _requestedRotation.x * _lateralRotationSpeed * Time.deltaTime, 0));
         }
     }
+
 }
