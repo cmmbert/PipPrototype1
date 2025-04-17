@@ -9,6 +9,11 @@ public class PipController : MonoBehaviour, IPlayerControllable
     [SerializeField] Transform _cameraTransform;
     [SerializeField] Transform _rotationPivot;
 
+
+    [SerializeField] float _jumpForceTotal = 500;
+    [SerializeField] float _jumpForceIncrement = 100;
+    bool _isJumping = false;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -22,11 +27,6 @@ public class PipController : MonoBehaviour, IPlayerControllable
     public void Attack2()
     {
         throw new System.NotImplementedException();
-    }
-
-    public void Jump()
-    {
-        Debug.Log("jump");
     }
 
     public void Move(Vector2 axis)
@@ -61,4 +61,18 @@ public class PipController : MonoBehaviour, IPlayerControllable
         throw new System.NotImplementedException();
     }
 
+    public void JumpStarted()
+    {
+        _rb.AddForce(0, _jumpForceTotal, 0);
+    }
+
+    public void JumpHeld()
+    {
+
+    }
+
+    public void JumpReleased()
+    {
+
+    }
 }

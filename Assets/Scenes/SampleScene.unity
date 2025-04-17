@@ -2344,6 +2344,8 @@ MonoBehaviour:
   _rotationSpeed: 360
   _cameraTransform: {fileID: 330585546}
   _rotationPivot: {fileID: 2040401243}
+  _jumpForceTotal: 500
+  _jumpForceIncrement: 100
 --- !u!54 &2005643429
 Rigidbody:
   m_ObjectHideFlags: 0
