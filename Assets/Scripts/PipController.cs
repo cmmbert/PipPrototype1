@@ -8,11 +8,13 @@ public class PipController : MonoBehaviour, IPlayerControllable
     [SerializeField] float _rotationSpeed = 360;
     [SerializeField] Transform _cameraTransform;
     [SerializeField] Transform _rotationPivot;
-
+    [SerializeField] GroundChecker _groundChecker;
 
     [SerializeField] float _jumpForceTotal = 500;
     [SerializeField] float _jumpForceIncrement = 100;
     bool _isJumping = false;
+
+    [SerializeField] float _extraGravity = 2;
 
     private void Awake()
     {
@@ -39,21 +41,37 @@ public class PipController : MonoBehaviour, IPlayerControllable
             var alpha = Mathf.Atan2(pip.y - camera.y, pip.x - camera.x);
             var beta = Mathf.Atan2(gevraagdeDir.y, gevraagdeDir.x) - (90 * Mathf.Deg2Rad);
             var y = alpha + beta;
-            //y *= Mathf.Rad2Deg;
             var dir = new Vector2(Mathf.Cos(y), Mathf.Sin(y)) + camera;
             var uitkomst = (dir - camera).normalized;
             _rotationPivot.rotation = Quaternion.RotateTowards(_rotationPivot.rotation, Quaternion.Euler(new Vector3(0, Mathf.Atan2(uitkomst.x, uitkomst.y) * Mathf.Rad2Deg, 0)), _rotationSpeed * Time.deltaTime);
             var force = new Vector3(uitkomst.x, 0, uitkomst.y) * _moveSpeed * Time.deltaTime;
             _rb.AddForce(force);
         }
+        else
+        {
+            //brake
+            if (_groundChecker.IsGrounded)
+            {
+                var velocity = _rb.linearVelocity;
+                velocity.x *= 0.9f;
+                velocity.z *= 0.9f;
+                _rb.linearVelocity = velocity;
+            }
+        }
     }
 
     void FixedUpdate()
     {
-        if (_rb.linearVelocity.magnitude > _maxSpeed)
+        var horizontalMovement = _rb.linearVelocity;
+        horizontalMovement.y = 0;
+        if (horizontalMovement.magnitude > _maxSpeed)
         {
-            _rb.linearVelocity = _rb.linearVelocity.normalized * _maxSpeed;
+            var cappedHorizontalMovement = horizontalMovement.normalized * _maxSpeed;
+            cappedHorizontalMovement.y = _rb.linearVelocity.y;
+            _rb.linearVelocity = cappedHorizontalMovement;
         }
+        if (!_groundChecker.IsGrounded && !_isJumping)
+            _rb.AddForce(Vector3.down * _extraGravity, ForceMode.Acceleration);
     }
 
     public void MoveCamera(Vector2 axis)
@@ -63,7 +81,10 @@ public class PipController : MonoBehaviour, IPlayerControllable
 
     public void JumpStarted()
     {
+        if (!_groundChecker.IsGrounded)
+            return;
         _rb.AddForce(0, _jumpForceTotal, 0);
+        _isJumping = true;
     }
 
     public void JumpHeld()
@@ -73,6 +94,6 @@ public class PipController : MonoBehaviour, IPlayerControllable
 
     public void JumpReleased()
     {
-
+        _isJumping = false;
     }
 }

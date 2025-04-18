@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour
         _jumpAction = _input.actions["Jump"];
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         _playerControllable.Move(_moveVector);
         _playerCamera.OnCameraMove(_cameraMoveVector);
@@ -32,10 +32,6 @@ public class PlayerController : MonoBehaviour
         _moveVector = value.Get<Vector2>();
     }
 
-    public void OnJumpHold()
-    {
-        Debug.Log("JumpHold");
-    }
 
     public void OnLook(InputValue value)
     {
