@@ -16,6 +16,8 @@ public class PipController : MonoBehaviour, IPlayerControllable
 
     [SerializeField] float _extraGravity = 2;
     [SerializeField] float _bounceMovementMultiplier = 1.5f;
+
+    float _hasBeenJumpingFor = 0;
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -43,7 +45,8 @@ public class PipController : MonoBehaviour, IPlayerControllable
             var y = alpha + beta;
             var dir = new Vector2(Mathf.Cos(y), Mathf.Sin(y)) + camera;
             var uitkomst = (dir - camera).normalized;
-            var jumpRotationMultiplier = _isBouncing ? _jumpRotationModifier : 1;
+            var jumpRotationMultiplier = _isBouncing ? _jumpRotationModifier * Mathf.Abs(axis.x): 1;
+            DebugManager.SetText(Mathf.Abs(axis.x).ToString());
             _rotationPivot.rotation = Quaternion.RotateTowards(
                 _rotationPivot.rotation, 
                 Quaternion.Euler(new Vector3(0, Mathf.Atan2(uitkomst.x, uitkomst.y) * Mathf.Rad2Deg, 0)), 
@@ -79,9 +82,10 @@ public class PipController : MonoBehaviour, IPlayerControllable
         if (!_groundChecker.IsGrounded && !_isJumping)
             _rb.AddForce(Vector3.down * _extraGravity, ForceMode.Acceleration);
 
-        if (_groundChecker.IsGrounded && !_isJumping)
-            _isBouncing = false;
+        //if (_groundChecker.IsGrounded && !_isJumping)
+        //    _isBouncing = false;
 
+        //if (_hasBeenJumpingFor > 0.2f)
         if (_isBouncing && _isJumping)
         {
             _cameraTransform.GetComponent<PlayerCamera>().OverrideCameraAngle(_rotationPivot.eulerAngles.y);
@@ -107,6 +111,9 @@ public class PipController : MonoBehaviour, IPlayerControllable
     bool _isBouncing = false;
     public void JumpHeld()
     {
+        _hasBeenJumpingFor += Time.deltaTime;
+        if (!_isJumping)
+            return;
         if (!_groundChecker.IsGrounded)
             _jumpHasLeftTheGround = true;
         if (!_jumpHasLeftTheGround)
@@ -127,5 +134,7 @@ public class PipController : MonoBehaviour, IPlayerControllable
         _isJumping = false;
         _jumpHasLeftTheGround = false;
         _cameraTransform.GetComponent<PlayerCamera>().StopOverride();
+        _hasBeenJumpingFor = 0;
+        _isBouncing = false;
     }
 }

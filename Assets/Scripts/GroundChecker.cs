@@ -8,6 +8,5 @@ public class GroundChecker : MonoBehaviour
     {
         IsGrounded = Physics.Raycast(transform.position, Vector3.down, _rayLength);
         Debug.DrawRay(transform.position, Vector3.down * _rayLength, Color.red);
-        DebugManager.SetText(IsGrounded.ToString());
     }
 }
