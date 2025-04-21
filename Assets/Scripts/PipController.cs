@@ -15,7 +15,7 @@ public class PipController : MonoBehaviour, IPlayerControllable
     bool _isJumping = false;
 
     [SerializeField] float _extraGravity = 2;
-
+    [SerializeField] float _bounceMovementMultiplier = 1.5f;
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -43,12 +43,13 @@ public class PipController : MonoBehaviour, IPlayerControllable
             var y = alpha + beta;
             var dir = new Vector2(Mathf.Cos(y), Mathf.Sin(y)) + camera;
             var uitkomst = (dir - camera).normalized;
-            var jumpMovementMultiplier = _isJumping ? _jumpRotationModifier : 1;
+            var jumpRotationMultiplier = _isBouncing ? _jumpRotationModifier : 1;
             _rotationPivot.rotation = Quaternion.RotateTowards(
                 _rotationPivot.rotation, 
                 Quaternion.Euler(new Vector3(0, Mathf.Atan2(uitkomst.x, uitkomst.y) * Mathf.Rad2Deg, 0)), 
-                _rotationSpeed * Time.deltaTime * jumpMovementMultiplier);
-            var force = new Vector3(uitkomst.x, 0, uitkomst.y) * _moveSpeed * Time.deltaTime;
+                _rotationSpeed * Time.deltaTime * jumpRotationMultiplier);
+            var force = _rotationPivot.forward * _moveSpeed * Time.deltaTime;
+                //new Vector3(uitkomst.x, 0, uitkomst.y) * _moveSpeed * Time.deltaTime;
             _rb.AddForce(force);
         }
         else
@@ -68,14 +69,19 @@ public class PipController : MonoBehaviour, IPlayerControllable
     {
         var horizontalMovement = _rb.linearVelocity;
         horizontalMovement.y = 0;
-        if (horizontalMovement.magnitude > _maxSpeed)
+        var bounceMovementMultiplier = _isBouncing ? _bounceMovementMultiplier : 1;
+        if (horizontalMovement.magnitude > _maxSpeed * bounceMovementMultiplier)
         {
-            var cappedHorizontalMovement = horizontalMovement.normalized * _maxSpeed;
+            var cappedHorizontalMovement = horizontalMovement.normalized * _maxSpeed * bounceMovementMultiplier;
             cappedHorizontalMovement.y = _rb.linearVelocity.y;
             _rb.linearVelocity = cappedHorizontalMovement;
         }
         if (!_groundChecker.IsGrounded && !_isJumping)
             _rb.AddForce(Vector3.down * _extraGravity, ForceMode.Acceleration);
+
+        if (_groundChecker.IsGrounded && !_isJumping)
+            _isBouncing = false;
+
     }
 
     public void MoveCamera(Vector2 axis)
@@ -94,6 +100,7 @@ public class PipController : MonoBehaviour, IPlayerControllable
     }
 
     bool _jumpHasLeftTheGround = false;
+    bool _isBouncing = false;
     public void JumpHeld()
     {
         if (!_groundChecker.IsGrounded)
@@ -107,6 +114,7 @@ public class PipController : MonoBehaviour, IPlayerControllable
             newVelocity.y = Mathf.Max(Mathf.Abs(newVelocity.y), _jumpVelocity);
             _rb.linearVelocity = newVelocity;
             _jumpHasLeftTheGround = false;
+            _isBouncing = true;
         }
     }
 
