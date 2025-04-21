@@ -16,7 +16,7 @@ public class PipController : MonoBehaviour, IPlayerControllable
 
     [SerializeField] float _extraGravity = 2;
     [SerializeField] float _bounceMovementMultiplier = 1.5f;
-
+    [SerializeField] Tail _tail;
     float _hasBeenJumpingFor = 0;
     private void Awake()
     {
@@ -82,10 +82,10 @@ public class PipController : MonoBehaviour, IPlayerControllable
         if (!_groundChecker.IsGrounded && !_isJumping)
             _rb.AddForce(Vector3.down * _extraGravity, ForceMode.Acceleration);
 
-        //if (_groundChecker.IsGrounded && !_isJumping)
-        //    _isBouncing = false;
-
-        //if (_hasBeenJumpingFor > 0.2f)
+        if (_hasBeenJumpingFor > 0.2f)
+        {
+            _tail.PointDown = true;
+        }
         if (_isBouncing && _isJumping)
         {
             _cameraTransform.GetComponent<PlayerCamera>().OverrideCameraAngle(_rotationPivot.eulerAngles.y);
@@ -136,5 +136,6 @@ public class PipController : MonoBehaviour, IPlayerControllable
         _cameraTransform.GetComponent<PlayerCamera>().StopOverride();
         _hasBeenJumpingFor = 0;
         _isBouncing = false;
+        _tail.PointDown = false;
     }
 }
