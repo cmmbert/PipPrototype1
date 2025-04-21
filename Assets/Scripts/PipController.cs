@@ -111,9 +111,9 @@ public class PipController : MonoBehaviour, IPlayerControllable
     bool _isBouncing = false;
     public void JumpHeld()
     {
-        _hasBeenJumpingFor += Time.deltaTime;
         if (!_isJumping)
             return;
+        _hasBeenJumpingFor += Time.deltaTime;
         if (!_groundChecker.IsGrounded)
             _jumpHasLeftTheGround = true;
         if (!_jumpHasLeftTheGround)
