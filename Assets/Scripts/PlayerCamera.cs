@@ -8,7 +8,7 @@ public class PlayerCamera : MonoBehaviour
 
 
     Vector2 _requestedRotation;
-    
+
 
     public void OnCameraMove(Vector2 axis)
     {
@@ -22,12 +22,26 @@ public class PlayerCamera : MonoBehaviour
         CameraRotation();
     }
 
+    bool _isBeingOverriden = false;
     void CameraRotation()
     {
-        if (Mathf.Abs(_requestedRotation.x) > 0)
-        {
-            _cameraRotationPoint.Rotate(new Vector3(0, _requestedRotation.x * _lateralRotationSpeed * Time.deltaTime, 0));
-        }
+        if (!_isBeingOverriden)
+            if (Mathf.Abs(_requestedRotation.x) > 0)
+            {
+                _cameraRotationPoint.Rotate(new Vector3(0, _requestedRotation.x * _lateralRotationSpeed * Time.deltaTime, 0));
+            }
     }
+
+    public void OverrideCameraAngle(float newAngle)
+    {
+        _cameraRotationPoint.rotation = Quaternion.RotateTowards(_cameraRotationPoint.rotation, Quaternion.Euler(new Vector3(0, newAngle, 0)), _lateralRotationSpeed * Time.deltaTime);
+        _isBeingOverriden = true;
+    }
+
+    public void StopOverride()
+    {
+        _isBeingOverriden = false;
+    }
+
 
 }

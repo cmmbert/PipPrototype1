@@ -49,7 +49,6 @@ public class PipController : MonoBehaviour, IPlayerControllable
                 Quaternion.Euler(new Vector3(0, Mathf.Atan2(uitkomst.x, uitkomst.y) * Mathf.Rad2Deg, 0)), 
                 _rotationSpeed * Time.deltaTime * jumpRotationMultiplier);
             var force = _rotationPivot.forward * _moveSpeed * Time.deltaTime;
-                //new Vector3(uitkomst.x, 0, uitkomst.y) * _moveSpeed * Time.deltaTime;
             _rb.AddForce(force);
         }
         else
@@ -76,12 +75,17 @@ public class PipController : MonoBehaviour, IPlayerControllable
             cappedHorizontalMovement.y = _rb.linearVelocity.y;
             _rb.linearVelocity = cappedHorizontalMovement;
         }
+
         if (!_groundChecker.IsGrounded && !_isJumping)
             _rb.AddForce(Vector3.down * _extraGravity, ForceMode.Acceleration);
 
         if (_groundChecker.IsGrounded && !_isJumping)
             _isBouncing = false;
 
+        if (_isBouncing && _isJumping)
+        {
+            _cameraTransform.GetComponent<PlayerCamera>().OverrideCameraAngle(_rotationPivot.eulerAngles.y);
+        }
     }
 
     public void MoveCamera(Vector2 axis)
@@ -122,5 +126,6 @@ public class PipController : MonoBehaviour, IPlayerControllable
     {
         _isJumping = false;
         _jumpHasLeftTheGround = false;
+        _cameraTransform.GetComponent<PlayerCamera>().StopOverride();
     }
 }
