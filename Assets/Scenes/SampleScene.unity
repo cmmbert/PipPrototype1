@@ -1153,7 +1153,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 50, y: 50}
-  m_SizeDelta: {x: 200, y: 50}
+  m_SizeDelta: {x: 1000, y: 50}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &548747344
 MonoBehaviour:
@@ -2843,6 +2843,8 @@ MonoBehaviour:
   _cameraTransform: {fileID: 330585546}
   _rotationPivot: {fileID: 2040401243}
   _groundChecker: {fileID: 45333008}
+  _facingForceCorrection: 3
+  _brakeValue: 0.9
   _jumpRotationModifier: 0.35
   _jumpVelocity: 7.5
   _extraGravity: 10
