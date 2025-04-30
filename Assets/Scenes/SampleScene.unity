@@ -3828,7 +3828,7 @@ MonoBehaviour:
   _facingForceCorrection: 3
   _brakeValue: 0.8
   _jumpRotationModifier: 0.35
-  _jumpVelocity: 7.5
+  _jumpVelocity: 7
   _extraGravity: 10
   _bounceMovementMultiplier: 1.5
   _tail: {fileID: 841056595}
