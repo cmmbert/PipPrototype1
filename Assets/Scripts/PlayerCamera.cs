@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PlayerCamera : MonoBehaviour
 {
+    [SerializeField] float _overrideRotationSpeedMultiplier = 0.5f;
     [SerializeField] Transform _cameraRotationPoint;
     [SerializeField] Transform _toFollow;
     [SerializeField] float _lateralRotationSpeed = 45;
@@ -34,7 +35,7 @@ public class PlayerCamera : MonoBehaviour
 
     public void OverrideCameraAngle(float newAngle)
     {
-        _cameraRotationPoint.rotation = Quaternion.RotateTowards(_cameraRotationPoint.rotation, Quaternion.Euler(new Vector3(0, newAngle, 0)), _lateralRotationSpeed * Time.deltaTime);
+        _cameraRotationPoint.rotation = Quaternion.RotateTowards(_cameraRotationPoint.rotation, Quaternion.Euler(new Vector3(0, newAngle, 0)), _lateralRotationSpeed * Time.deltaTime * _overrideRotationSpeedMultiplier);
         _isBeingOverriden = true;
     }
 

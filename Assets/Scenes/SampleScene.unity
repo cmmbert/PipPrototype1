@@ -802,6 +802,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c1a22b06b2b7ae47b29bcac15af0144, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _overrideRotationSpeedMultiplier: 0.5
   _cameraRotationPoint: {fileID: 1999268959}
   _toFollow: {fileID: 2005643427}
   _lateralRotationSpeed: 180
@@ -2035,7 +2036,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PointDown: 0
-  _rotationSpeed: 360
+  _rotationSpeed: 720
 --- !u!4 &845194455 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 62ab8808dc7e2914f82d8823a1481cbb, type: 3}

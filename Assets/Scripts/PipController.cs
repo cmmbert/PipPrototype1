@@ -14,12 +14,12 @@ public class PipController : MonoBehaviour, IPlayerControllable
 
     [SerializeField] float _jumpRotationModifier = 0.35f;
     [SerializeField] float _jumpVelocity = 6;
-    bool _isJumping = false;
+    bool _isHoldingJumpButton = false;
 
     [SerializeField] float _extraGravity = 2;
     [SerializeField] float _bounceMovementMultiplier = 1.5f;
     [SerializeField] Tail _tail;
-    float _hasBeenJumpingFor = 0;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -97,63 +97,66 @@ public class PipController : MonoBehaviour, IPlayerControllable
             _rb.linearVelocity = cappedHorizontalMovement;
         }
 
-        if (!_groundChecker.IsGrounded && !_isJumping)
+        if (!_groundChecker.IsGrounded && !_isHoldingJumpButton)
             _rb.AddForce(Vector3.down * _extraGravity, ForceMode.Acceleration);
 
-        if (_hasBeenJumpingFor > 0.2f)
-        {
-            _tail.PointDown = true;
-        }
-        if (_isBouncing && _isJumping)
-        {
-            _cameraTransform.GetComponent<PlayerCamera>().OverrideCameraAngle(_rotationPivot.eulerAngles.y);
-        }
+        
     }
 
     public void MoveCamera(Vector2 axis)
     {
-        throw new System.NotImplementedException();
     }
 
     public void JumpStarted()
     {
-        if (!_groundChecker.IsGrounded)
-            return; 
-        var newVelocity = _rb.linearVelocity;
-        newVelocity.y = _jumpVelocity;
-        _rb.linearVelocity = newVelocity;
-        _isJumping = true;
+        _isHoldingJumpButton = true;
+        if (_groundChecker.IsGrounded)
+        {
+            var newVelocity = _rb.linearVelocity;
+            newVelocity.y = _jumpVelocity;
+            _rb.linearVelocity = newVelocity;
+        }
+        else
+        {
+            _isBouncing = true;
+            _tail.PointDown = true;
+        }
     }
 
     bool _jumpHasLeftTheGround = false;
     bool _isBouncing = false;
     public void JumpHeld()
     {
-        if (!_isJumping)
-            return;
-        _hasBeenJumpingFor += Time.deltaTime;
         if (!_groundChecker.IsGrounded)
             _jumpHasLeftTheGround = true;
         if (!_jumpHasLeftTheGround)
             return;
 
-        if (_groundChecker.IsGrounded)
+        if (_isBouncing)
         {
-            var newVelocity = _rb.linearVelocity;
-            newVelocity.y = Mathf.Max(Mathf.Abs(newVelocity.y), _jumpVelocity);
-            _rb.linearVelocity = newVelocity;
-            _jumpHasLeftTheGround = false;
-            _isBouncing = true;
+            _cameraTransform.GetComponent<PlayerCamera>().OverrideCameraAngle(_rotationPivot.eulerAngles.y);
+            if (_groundChecker.IsGrounded)
+            {
+                DoBounce();
+            }
         }
     }
 
     public void JumpReleased()
     {
-        _isJumping = false;
+        _isHoldingJumpButton = false;
         _jumpHasLeftTheGround = false;
         _cameraTransform.GetComponent<PlayerCamera>().StopOverride();
-        _hasBeenJumpingFor = 0;
         _isBouncing = false;
         _tail.PointDown = false;
     }
+
+    void DoBounce()
+    {
+        var newVelocity = _rb.linearVelocity;
+        newVelocity.y = Mathf.Max(Mathf.Abs(newVelocity.y), _jumpVelocity);
+        _rb.linearVelocity = newVelocity;
+        _jumpHasLeftTheGround = false;
+    }
+
 }
