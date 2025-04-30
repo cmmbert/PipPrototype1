@@ -46,10 +46,12 @@ public class PipController : MonoBehaviour, IPlayerControllable
             var alpha = Mathf.Atan2(pip.y - camera.y, pip.x - camera.x);
             var beta = Mathf.Atan2(gevraagdeDir.y, gevraagdeDir.x) - (90 * Mathf.Deg2Rad);
 
-            //https://www.geogebra.org/calculator/bwqwwpax
+            //MATH: https://www.geogebra.org/calculator/bwqwwpax
             var y = alpha + beta;
             var dir = new Vector2(Mathf.Cos(y), Mathf.Sin(y)) + camera;
             var uitkomst = (dir - camera).normalized;
+
+            //ROTATION
             //Make sure the rotation is slower when bouncing
             var jumpRotationMultiplier = _isBouncing ? _jumpRotationModifier * Mathf.Abs(axis.x): 1;
 
@@ -58,7 +60,7 @@ public class PipController : MonoBehaviour, IPlayerControllable
                 Quaternion.Euler(new Vector3(0, Mathf.Atan2(uitkomst.x, uitkomst.y) * Mathf.Rad2Deg, 0)), 
                 _rotationSpeed * Time.deltaTime * jumpRotationMultiplier);
 
-            //Movement
+            //MOVEMENT
             //Makes sure movement only starts when the char is looking at the requested distance
             var forward2d = new Vector2(_rotationPivot.forward.x, _rotationPivot.forward.z);
             //DebugManager.SetText(uitkomst.ToString() + ", " + forward2d.ToString() + "= " + Vector2.Angle(uitkomst, forward2d).ToString());
@@ -84,6 +86,7 @@ public class PipController : MonoBehaviour, IPlayerControllable
 
     void FixedUpdate()
     {
+        //cap horizontalmovement
         var horizontalMovement = _rb.linearVelocity;
         horizontalMovement.y = 0;
         var bounceMovementMultiplier = _isBouncing ? _bounceMovementMultiplier : 1;
