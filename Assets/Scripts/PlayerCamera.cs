@@ -4,9 +4,10 @@ public class PlayerCamera : MonoBehaviour
 {
     [SerializeField] float _overrideRotationSpeedMultiplier = 0.5f;
     [SerializeField] Transform _cameraRotationPoint;
-    [SerializeField] Transform _toFollow;
+    [SerializeField] Transform _anchor;
     [SerializeField] float _lateralRotationSpeed = 45;
-
+    [SerializeField] float _maxDistance = 4;
+    [SerializeField] Transform _desiredPosition;
 
     Vector2 _requestedRotation;
 
@@ -21,6 +22,11 @@ public class PlayerCamera : MonoBehaviour
     private void FixedUpdate()
     {
         CameraRotation();
+    }
+
+    private void LateUpdate()
+    {
+        HandleClipping();
     }
 
     bool _isBeingOverriden = false;
@@ -44,5 +50,23 @@ public class PlayerCamera : MonoBehaviour
         _isBeingOverriden = false;
     }
 
+    void HandleClipping()
+    {
+        RaycastHit hit;
+        Vector3 direction = _desiredPosition.position - _anchor.position;
+        Ray ray = new Ray(_anchor.position, direction);
+        Debug.DrawLine(_anchor.position, _anchor.position + direction.normalized * _maxDistance, Color.yellow);
+        DebugManager.SetText(direction.ToString());
+        if (Physics.Raycast(ray, out hit, _maxDistance))
+        {
+            transform.position = hit.point;
+            DebugManager.SetText("hit");
+        }
+        else
+        {
+            transform.position = _desiredPosition.position;
+            DebugManager.SetText("no hit");
+        }
+    }
 
 }
