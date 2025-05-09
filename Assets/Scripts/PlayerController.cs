@@ -38,6 +38,11 @@ public class PlayerController : MonoBehaviour
         _cameraMoveVector = value.Get<Vector2>();
     }
 
+    public void OnAttack1()
+    {
+        _playerControllable.Attack1();
+    }
+
     void HandleJump()
     {
         if (_jumpAction.IsPressed())

@@ -20,6 +20,8 @@ public class PipController : MonoBehaviour, IPlayerControllable
     [SerializeField] float _bounceMovementMultiplier = 1.5f;
     [SerializeField] Tail _tail;
 
+    [SerializeField] DevAttack1 _devAttack1;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -27,7 +29,8 @@ public class PipController : MonoBehaviour, IPlayerControllable
 
     public void Attack1()
     {
-        throw new System.NotImplementedException();
+        if (!_isBouncing)
+            _devAttack1.Attack();
     }
 
     public void Attack2()
@@ -51,26 +54,29 @@ public class PipController : MonoBehaviour, IPlayerControllable
             var dir = new Vector2(Mathf.Cos(y), Mathf.Sin(y)) + camera;
             var uitkomst = (dir - camera).normalized;
 
-            //ROTATION
-            //Make sure the rotation is slower when bouncing
-            var jumpRotationMultiplier = _isBouncing ? _jumpRotationModifier * Mathf.Abs(axis.x): 1;
-
-            _rotationPivot.rotation = Quaternion.RotateTowards(
-                _rotationPivot.rotation, 
-                Quaternion.Euler(new Vector3(0, Mathf.Atan2(uitkomst.x, uitkomst.y) * Mathf.Rad2Deg, 0)), 
-                _rotationSpeed * Time.deltaTime * jumpRotationMultiplier);
-
-            //MOVEMENT
-            //Makes sure movement only starts when the char is looking at the requested distance
-            var forward2d = new Vector2(_rotationPivot.forward.x, _rotationPivot.forward.z);
-            //DebugManager.SetText(uitkomst.ToString() + ", " + forward2d.ToString() + "= " + Vector2.Angle(uitkomst, forward2d).ToString());
-            var angleBetweenRequestedAndForward = Vector2.Angle(uitkomst, forward2d);
             float angleForceModifier = 1;
-            if (angleBetweenRequestedAndForward > 0) // prevents dividing by 0
+            if (!_devAttack1.IsAttacking)
             {
-                angleForceModifier -= angleBetweenRequestedAndForward / 180; //0 when facing away, 1 when facing towards requested angle
-                angleForceModifier = Mathf.Pow(angleForceModifier, _facingForceCorrection);
+                //ROTATION
+                //Make sure the rotation is slower when bouncing
+                var jumpRotationMultiplier = _isBouncing ? _jumpRotationModifier * Mathf.Abs(axis.x) : 1;
+
+                _rotationPivot.rotation = Quaternion.RotateTowards(
+                    _rotationPivot.rotation,
+                    Quaternion.Euler(new Vector3(0, Mathf.Atan2(uitkomst.x, uitkomst.y) * Mathf.Rad2Deg, 0)),
+                    _rotationSpeed * Time.deltaTime * jumpRotationMultiplier);
+                //MOVEMENT
+                //Makes sure movement only starts when the char is looking at the requested distance
+                var forward2d = new Vector2(_rotationPivot.forward.x, _rotationPivot.forward.z);
+                //DebugManager.SetText(uitkomst.ToString() + ", " + forward2d.ToString() + "= " + Vector2.Angle(uitkomst, forward2d).ToString());
+                var angleBetweenRequestedAndForward = Vector2.Angle(uitkomst, forward2d);
+                if (angleBetweenRequestedAndForward > 0) // prevents dividing by 0
+                {
+                    angleForceModifier -= angleBetweenRequestedAndForward / 180; //0 when facing away, 1 when facing towards requested angle
+                    angleForceModifier = Mathf.Pow(angleForceModifier, _facingForceCorrection);
+                }
             }
+
             var force = _rotationPivot.forward * _moveSpeed * Time.deltaTime * angleForceModifier * axis.magnitude;
             _rb.AddForce(force);
         }
@@ -100,7 +106,7 @@ public class PipController : MonoBehaviour, IPlayerControllable
         if (!_groundChecker.IsGrounded && !_isHoldingJumpButton)
             _rb.AddForce(Vector3.down * _extraGravity, ForceMode.Acceleration);
 
-        
+
     }
 
     public void MoveCamera(Vector2 axis)
